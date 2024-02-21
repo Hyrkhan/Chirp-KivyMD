@@ -3,8 +3,10 @@ from kivymd.app import MDApp
 from kivy.core.window import Window
 Window.size = (350, 600)
 from kivy.uix.screenmanager import Screen, ScreenManager, SlideTransition, NoTransition
+from kivymd.uix.dialog import MDDialog
+from kivymd.uix.button import MDFlatButton
 import sqlite3
-
+import re
 
 class LoginScreen(Screen):
     pass
@@ -23,10 +25,6 @@ class PracticeApp(MDApp):
         
         self.create_table()
         return screen_manager
-    
-    def show_data(self, username, password):       
-        print(f"Username: {username}")
-        print(f"Password: {password}")
 
     def create_table(self):
         conn = sqlite3.connect('practice_db.db')
@@ -43,17 +41,70 @@ class PracticeApp(MDApp):
         conn.commit()
         conn.close()
 
+    def popup_error(self, string):
+        close_button = MDFlatButton(text="Close", on_release=self.close_dialog)
+
+        self.dialog = MDDialog(
+            title="Error!",
+            text = string,
+            buttons= [close_button]
+        )
+        self.dialog.open()
+
+    def close_dialog(self, *args):
+        self.dialog.dismiss()
+
+    def login_validation(self, username, password):   
+        error_string = ""    
+        if not username:
+            error_string = "Please enter Username to Login"
+        elif not password:
+            error_string = "Please enter Password to Login"
+        else:
+            result = self.username_password_validation(username, password)
+            if result != "Proceed":
+                error_string = result 
+            else:
+                print("Login Success!")    
+        if error_string:
+            self.popup_error(error_string)
+
+    def username_password_validation(self, uname, password):
+        conn = sqlite3.connect('practice_db.db')
+        c = conn.cursor()
+
+        c.execute("SELECT * FROM users WHERE uname = ?", (uname,))
+        result1 = c.fetchone()
+
+        if result1 is None:
+            conn.close()
+            return "User has not been registered yet"
+        else:
+            c.execute("SELECT password FROM users WHERE uname = ?", (uname,))
+            passw = c.fetchone()
+            conn.close()
+            if passw[0] != password:
+                return f"Password is Incorrect"
+            else:
+                return "Proceed"
+
     def register_validation(self, fname, lname, uname, email, password, cpassword):
+        error_string = ""
         signUp_validate = self.signUp_emptyField_validation(fname, lname, uname, email, password, cpassword)
         if signUp_validate == "Proceed":
-            if self.database_lookup(uname, email):
-                print("Username or Email already taken")
+            if self.username_email_validation(uname, email):
+                error_string = "Username or Email already taken"
+            elif not self.validate_email(email):
+                error_string = "Please enter a valid email address"
             elif password != cpassword:
-                print("Password and Confirm Password is not the same")
+                error_string = "Password and Confirm Password is not the same"
             else:
                 print("Can be registered")
         else:
-            print(signUp_validate)     
+            error_string = signUp_validate
+            
+        if error_string:
+            self.popup_error(error_string)  
 
     def register(self, fname, lname, uname, email, password):
         conn = sqlite3.connect('practice_db.db')
@@ -70,7 +121,7 @@ class PracticeApp(MDApp):
         conn.commit()
         conn.close()
 
-    def database_lookup(self, uname, email):
+    def username_email_validation(self, uname, email):
         conn = sqlite3.connect('practice_db.db')
         c = conn.cursor()
 
@@ -87,20 +138,20 @@ class PracticeApp(MDApp):
             return True
         
     def signUp_emptyField_validation(self, fname, lname, uname, email, password, cpassword):
-        if not fname:
-            return "Please enter your First Name"
-        elif not lname:
-            return "Please enter your Last Name"
-        elif not uname:
-            return "Please enter your Username"
-        elif not email:
-            return "Please enter your Email"
-        elif not password:
-            return "Please enter your Password"
-        elif not cpassword:
-            return "Please enter your Password again to Confirm"
+        params = {
+            "First Name": fname, "Last Name": lname, "Username": uname, "Email": email, "Password": password, "Password again to Confirm" : cpassword
+            }
+        for key, val in params.items():
+            if not val:
+                return f"Please enter your {key}"
+        return "Proceed"     
+
+    def validate_email(self, email):
+        pattern = r'^\S+@(\w+\.)?(\w+\.(com|edu|gov|co|govt)(\.\w+)?)$'
+        if re.match(pattern, email):
+            return True
         else:
-            return "Proceed"
+            return False
 
     def changescreen_to_signupscreen(self):
         screen_manager = self.root
