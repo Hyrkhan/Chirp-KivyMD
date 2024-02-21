@@ -42,7 +42,7 @@
             font_size: 20
             size_hint_x: 0.6
             size_hint_y: 0.08
-            on_release: app.show_data(username_input.text, password_input.text)
+            on_release: app.login_validation(username_input.text, password_input.text)
 
         MDLabel:
             text: "Don't have an account?"
@@ -153,6 +153,3 @@
             theme_text_color: "Custom"
             text_color: 0.3607, 0.3882, 1
             on_release: app.changescreen_to_loginscreen()
-
-
-
