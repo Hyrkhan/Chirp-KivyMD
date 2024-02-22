@@ -12,8 +12,20 @@ class LoginScreen(Screen):
     pass
 class SignUpScreen(Screen):
     pass
+class HomeScreen(Screen):
+    pass
+class MessageScreen(Screen):
+    pass
+class FriendScreen(Screen):
+    pass
+class ProfileScreen(Screen):
+    pass
 
 class PracticeApp(MDApp):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.dialog = None
+
     def build(self):
         self.theme_cls.primary_palette = "Green"
         self.theme_cls.primary_hue = "A700"
@@ -22,6 +34,10 @@ class PracticeApp(MDApp):
         screen_manager = ScreenManager()
         screen_manager.add_widget(LoginScreen(name='loginScreen'))
         screen_manager.add_widget(SignUpScreen(name='signUpScreen'))
+        screen_manager.add_widget(HomeScreen(name='homeScreen'))
+        screen_manager.add_widget(MessageScreen(name='messageScreen'))
+        screen_manager.add_widget(FriendScreen(name='friendScreen'))
+        screen_manager.add_widget(ProfileScreen(name='profileScreen'))
         
         self.create_table()
         return screen_manager
@@ -52,7 +68,8 @@ class PracticeApp(MDApp):
         self.dialog.open()
 
     def close_dialog(self, *args):
-        self.dialog.dismiss()
+        if self.dialog:
+            self.dialog.dismiss()
 
     def login_validation(self, username, password):   
         error_string = ""    
@@ -65,7 +82,7 @@ class PracticeApp(MDApp):
             if result != "Proceed":
                 error_string = result 
             else:
-                print("Login Success!")    
+                self.home_action() 
         if error_string:
             self.popup_error(error_string)
 
@@ -101,8 +118,7 @@ class PracticeApp(MDApp):
             else:
                 print("Can be registered")
         else:
-            error_string = signUp_validate
-            
+            error_string = signUp_validate       
         if error_string:
             self.popup_error(error_string)  
 
@@ -165,4 +181,41 @@ class PracticeApp(MDApp):
         screen_manager.transition.direction = 'right'
         screen_manager.current = 'loginScreen'
     
+    def home_action(self):
+        screen_manager = self.root
+        screen_manager.transition = SlideTransition()
+        screen_manager.transition.direction = 'left'
+        screen_manager.current = 'homeScreen'
+        self.close_dialog()
+
+    def back_home_action(self):
+        screen_manager = self.root
+        screen_manager.transition = NoTransition()
+        screen_manager.current = 'homeScreen'
+
+    def message_action(self):
+        screen_manager = self.root
+        screen_manager.transition = NoTransition()
+        screen_manager.current = 'messageScreen'
+    
+    def back_message_action(self):
+        screen_manager = self.root
+        screen_manager.transition = NoTransition()
+        screen_manager.current = 'messageScreen'
+        
+    def friends_action(self):
+        screen_manager = self.root
+        screen_manager.transition = NoTransition()
+        screen_manager.current = 'friendScreen'
+
+    def back_friends_action(self):
+        screen_manager = self.root
+        screen_manager.transition = NoTransition()
+        screen_manager.current = 'friendScreen'
+
+    def profile_action(self):
+        screen_manager = self.root
+        screen_manager.transition = NoTransition()
+        screen_manager.current = 'profileScreen'
+
 PracticeApp().run()
