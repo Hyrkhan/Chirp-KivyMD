@@ -5,6 +5,7 @@ Window.size = (350, 600)
 from kivy.uix.screenmanager import Screen, ScreenManager, SlideTransition, NoTransition
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.button import MDFlatButton
+from kivymd.uix.menu import MDDropdownMenu
 import sqlite3
 import re
 
@@ -30,8 +31,24 @@ class PracticeApp(MDApp):
         self.theme_cls.primary_palette = "Green"
         self.theme_cls.primary_hue = "A700"
 
+        menu_list = [
+            {
+                "viewclass": "OneLineListItem",
+                "text": "Switch to Dark Mode",
+            },
+            {
+                "viewclass": "OneLineListItem",
+                "text": "Settings",
+            }
+        ]
+        self.menu = MDDropdownMenu(
+            items = menu_list,
+            width_mult = 4
+        )
+
         screen = Builder.load_file('ScreenDesigns.kv')
         screen_manager = ScreenManager()
+        
         screen_manager.add_widget(LoginScreen(name='loginScreen'))
         screen_manager.add_widget(SignUpScreen(name='signUpScreen'))
         screen_manager.add_widget(HomeScreen(name='homeScreen'))
@@ -42,6 +59,10 @@ class PracticeApp(MDApp):
         self.create_table()
         return screen_manager
 
+    def dropdown(self, button):
+        self.menu.caller = button
+        self.menu.open()
+        
     def create_table(self):
         conn = sqlite3.connect('practice_db.db')
         c = conn.cursor()
