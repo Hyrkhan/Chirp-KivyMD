@@ -142,7 +142,7 @@
         MDTopAppBar:
             title: "Home"
             left_action_items: [["language-python", lambda x: app.changescreen_to_loginscreen()]]
-            right_action_items: [["menu"]]
+            right_action_items: [["menu", lambda x: app.dropdown(x)]]
             pos_hint: {'top': 1}
             specific_text_color: app.theme_cls.primary_color
             specific_text_hue: app.theme_cls.primary_hue
@@ -170,7 +170,7 @@
         MDTopAppBar:
             title: "Message"
             left_action_items: [["language-python", lambda x: app.changescreen_to_loginscreen()]]
-            right_action_items: [["menu"]]
+            right_action_items: [["menu", lambda x: app.dropdown(x)]]
             pos_hint: {'top': 1}
             specific_text_color: app.theme_cls.primary_color
             specific_text_hue: app.theme_cls.primary_hue
@@ -198,7 +198,7 @@
         MDTopAppBar:
             title: "Friends"
             left_action_items: [["language-python", lambda x: app.changescreen_to_loginscreen()]]
-            right_action_items: [["menu"]]
+            right_action_items: [["menu", lambda x: app.dropdown(x)]]
             pos_hint: {'top': 1}
             specific_text_color: app.theme_cls.primary_color
             specific_text_hue: app.theme_cls.primary_hue
@@ -226,7 +226,7 @@
         MDTopAppBar:
             title: "Profile"
             left_action_items: [["language-python", lambda x: app.changescreen_to_loginscreen()]]
-            right_action_items: [["menu"]]
+            right_action_items: [["menu", lambda x: app.dropdown(x)]]
             pos_hint: {'top': 1}
             specific_text_color: app.theme_cls.primary_color
             specific_text_hue: app.theme_cls.primary_hue
