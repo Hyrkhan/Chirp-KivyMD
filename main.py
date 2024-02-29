@@ -21,6 +21,10 @@ class FriendScreen(Screen):
     pass
 class ProfileScreen(Screen):
     pass
+class SettingsScreen(Screen):
+    pass
+class AddFriendScreen(Screen):
+    pass
 
 class PracticeApp(MDApp):
     def __init__(self, **kwargs):
@@ -39,6 +43,7 @@ class PracticeApp(MDApp):
             {
                 "viewclass": "OneLineListItem",
                 "text": "Settings",
+                "on_release": lambda x = "Settings": self.settings_action()
             }
         ]
         self.menu = MDDropdownMenu(
@@ -55,6 +60,8 @@ class PracticeApp(MDApp):
         screen_manager.add_widget(MessageScreen(name='messageScreen'))
         screen_manager.add_widget(FriendScreen(name='friendScreen'))
         screen_manager.add_widget(ProfileScreen(name='profileScreen'))
+        screen_manager.add_widget(SettingsScreen(name="settingsScreen"))
+        screen_manager.add_widget(AddFriendScreen(name="addFriendScreen"))
         
         self.create_table()
         return screen_manager
@@ -238,5 +245,26 @@ class PracticeApp(MDApp):
         screen_manager = self.root
         screen_manager.transition = NoTransition()
         screen_manager.current = 'profileScreen'
+
+    def settings_action(self):
+        screen_manager = self.root
+        self.beforeScreen = screen_manager.current
+        screen_manager.transition = SlideTransition()
+        screen_manager.transition.direction = 'left'
+        screen_manager.current = 'settingsScreen'
+        self.menu.dismiss()
+
+    def back_to_beforeScreen(self):
+        screen_manager = self.root
+        screen_manager.transition = SlideTransition()
+        screen_manager.transition.direction = 'right'
+        screen_manager.current = self.beforeScreen
+
+    def addFriend_action(self):
+        screen_manager = self.root
+        self.beforeScreen = screen_manager.current
+        screen_manager.transition = SlideTransition()
+        screen_manager.transition.direction = 'left'
+        screen_manager.current = 'addFriendScreen'
 
 PracticeApp().run()
