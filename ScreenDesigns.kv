@@ -219,6 +219,7 @@
             icon_color: 0,0,0,1
             pos_hint: {'center_x':0.8, 'center_y':0.1}
             size_hint: (.2, .13)
+            on_release: app.addFriend_action()
 
 <ProfileScreen>
     name: 'profileScreen'
@@ -261,4 +262,18 @@
             md_bg_color: 0,0,0,1
         MDLabel:
             text: "This is the settings page. You can edit profile and app preferences here."
+            halign: "center"
+
+<AddFriendScreen>
+    name: 'addFriendScreen'
+    MDFloatLayout:
+        MDTopAppBar:
+            title: "Search"
+            left_action_items: [["undo", lambda x: app.back_to_beforeScreen()]]
+            pos_hint: {'top': 1}
+            specific_text_color: app.theme_cls.primary_color
+            specific_text_hue: app.theme_cls.primary_hue
+            md_bg_color: 0,0,0,1
+        MDLabel:
+            text: "This is the add friends page. You can search the database for a user here using their full name."
             halign: "center"
