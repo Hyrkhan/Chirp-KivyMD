@@ -6,6 +6,7 @@ from kivy.uix.screenmanager import Screen, ScreenManager, SlideTransition, NoTra
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.button import MDFlatButton
 from kivymd.uix.menu import MDDropdownMenu
+from kivymd.uix.list import OneLineListItem
 import sqlite3
 import re
 
@@ -24,6 +25,12 @@ class ProfileScreen(Screen):
 class SettingsScreen(Screen):
     pass
 class AddFriendScreen(Screen):
+    pass
+class CreatePostScreen(Screen):
+    pass
+class CreateMessageScreen(Screen):
+    pass
+class EditProfileScreen(Screen):
     pass
 
 class PracticeApp(MDApp):
@@ -62,7 +69,10 @@ class PracticeApp(MDApp):
         screen_manager.add_widget(ProfileScreen(name='profileScreen'))
         screen_manager.add_widget(SettingsScreen(name="settingsScreen"))
         screen_manager.add_widget(AddFriendScreen(name="addFriendScreen"))
-        
+        screen_manager.add_widget(CreatePostScreen(name="createPostScreen"))
+        screen_manager.add_widget(CreateMessageScreen(name="createMessageScreen"))
+        screen_manager.add_widget(EditProfileScreen(name="editProfileScreen"))
+
         self.create_table()
         return screen_manager
 
@@ -144,7 +154,8 @@ class PracticeApp(MDApp):
             elif password != cpassword:
                 error_string = "Password and Confirm Password is not the same"
             else:
-                print("Can be registered")
+                self.register(fname, lname, uname, email, password)
+                print("Register successfull")
         else:
             error_string = signUp_validate       
         if error_string:
@@ -225,18 +236,8 @@ class PracticeApp(MDApp):
         screen_manager = self.root
         screen_manager.transition = NoTransition()
         screen_manager.current = 'messageScreen'
-    
-    def back_message_action(self):
-        screen_manager = self.root
-        screen_manager.transition = NoTransition()
-        screen_manager.current = 'messageScreen'
         
     def friends_action(self):
-        screen_manager = self.root
-        screen_manager.transition = NoTransition()
-        screen_manager.current = 'friendScreen'
-
-    def back_friends_action(self):
         screen_manager = self.root
         screen_manager.transition = NoTransition()
         screen_manager.current = 'friendScreen'
@@ -246,6 +247,12 @@ class PracticeApp(MDApp):
         screen_manager.transition = NoTransition()
         screen_manager.current = 'profileScreen'
 
+    def back_to_beforeScreen(self):
+        screen_manager = self.root
+        screen_manager.transition = SlideTransition()
+        screen_manager.transition.direction = 'right'
+        screen_manager.current = self.beforeScreen
+
     def settings_action(self):
         screen_manager = self.root
         self.beforeScreen = screen_manager.current
@@ -254,17 +261,49 @@ class PracticeApp(MDApp):
         screen_manager.current = 'settingsScreen'
         self.menu.dismiss()
 
-    def back_to_beforeScreen(self):
-        screen_manager = self.root
-        screen_manager.transition = SlideTransition()
-        screen_manager.transition.direction = 'right'
-        screen_manager.current = self.beforeScreen
-
     def addFriend_action(self):
         screen_manager = self.root
         self.beforeScreen = screen_manager.current
         screen_manager.transition = SlideTransition()
         screen_manager.transition.direction = 'left'
         screen_manager.current = 'addFriendScreen'
+
+    def createPost_action(self):
+        screen_manager = self.root
+        self.beforeScreen = screen_manager.current
+        screen_manager.transition = SlideTransition()
+        screen_manager.transition.direction = 'left'
+        screen_manager.current = 'createPostScreen'
+
+    def createMessage_action(self):
+        screen_manager = self.root
+        self.beforeScreen = screen_manager.current
+        screen_manager.transition = SlideTransition()
+        screen_manager.transition.direction = 'left'
+        screen_manager.current = 'createMessageScreen'
+
+    def editProfile_action(self):
+        screen_manager = self.root
+        self.beforeScreen = screen_manager.current
+        screen_manager.transition = SlideTransition()
+        screen_manager.transition.direction = 'left'
+        screen_manager.current = 'editProfileScreen'
+
+    def get_users_from_database(self):
+        conn = sqlite3.connect('practice_db.db')
+        c = conn.cursor()
+        c.execute("SELECT * FROM users")
+        users = c.fetchall()
+        conn.close()
+        return users
+
+    def display_allUsers(self):
+        addfriend_screen = self.root.get_screen('addFriendScreen')
+        addfriend_screen.ids.user_list.clear_widgets()  # Clear existing users
+        users = self.get_users_from_database()
+        for user in users:
+            addfriend_screen.ids.user_list.add_widget(
+                OneLineListItem(text=f"{user[1]} {user[2]}")
+            )
 
 PracticeApp().run()
