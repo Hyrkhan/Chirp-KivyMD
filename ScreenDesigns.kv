@@ -19,6 +19,7 @@
             size_hint_x: None 
             width: 220
             md_bg_color: app.theme_cls.primary_dark
+            write_tab: False
         MDTextField:
             id: password_input
             hint_text: "Enter password"
@@ -27,6 +28,8 @@
             size_hint_x: None 
             width: 220
             md_bg_color: app.theme_cls.primary_dark
+            multiline: False
+            on_text_validate: app.login_validation(username_input.text, password_input.text)
         MDRoundFlatButton:
             md_bg_color: 0,0,0,1
             line_color: 0,0,0,1
@@ -74,6 +77,7 @@
             pos_hint: {'center_x':0.5, 'center_y':0.68}
             size_hint_x: None 
             width: 220
+            write_tab: False
         MDTextField:
             id: lastname_input
             hint_text: "Enter lastname"
@@ -81,6 +85,7 @@
             pos_hint: {'center_x':0.5, 'center_y':0.60}
             size_hint_x: None 
             width: 220
+            write_tab: False
         MDTextField:
             id: username_input
             hint_text: "Enter username"
@@ -88,6 +93,7 @@
             pos_hint: {'center_x':0.5, 'center_y':0.52}
             size_hint_x: None 
             width: 220
+            write_tab: False
         MDTextField:
             id: email_input
             hint_text: "Enter email"
@@ -95,6 +101,7 @@
             pos_hint: {'center_x':0.5, 'center_y':0.44}
             size_hint_x: None 
             width: 220
+            write_tab: False
         MDTextField:
             id: password_input
             hint_text: "Enter password"
@@ -102,6 +109,7 @@
             pos_hint: {'center_x':0.5, 'center_y':0.36}
             size_hint_x: None 
             width: 220
+            write_tab: False
         MDTextField:
             id: confirm_password_input
             hint_text: "Confirm password"
@@ -109,6 +117,8 @@
             pos_hint: {'center_x':0.5, 'center_y':0.28}
             size_hint_x: None 
             width: 220
+            multiline: False
+            on_text_validate: app.register_validation(firstname_input.text, lastname_input.text, username_input.text, email_input.text, password_input.text, confirm_password_input.text)
         MDRoundFlatButton:
             md_bg_color: 0,0,0,1
             text_color: "white"
@@ -163,6 +173,7 @@
             icon_color: 0,0,0,1
             pos_hint: {'center_x':0.8, 'center_y':0.1}
             size_hint: (.2, .13)
+            on_release: app.createPost_action()
 
 <MessageScreen>
     name: 'messageScreen'
@@ -191,6 +202,7 @@
             icon_color: 0,0,0,1
             pos_hint: {'center_x':0.8, 'center_y':0.1}
             size_hint: (.2, .13)
+            on_release: app.createMessage_action()
 
 <FriendScreen>
     name: 'friendScreen'
@@ -204,10 +216,10 @@
             specific_text_hue: app.theme_cls.primary_hue
             md_bg_color: 0,0,0,1
         MDLabel:
-            text: "This is the Friends page where you can see all your friends (users who follows you too)."
+            text: "No Friends?"
             halign: "center"
         MDTopAppBar:
-            left_action_items: [["earth", lambda x: app.back_home_action()], ["chat-processing", lambda x: app.back_message_action()], ["account-multiple-outline"], ["account-circle", lambda x: app.profile_action()]]
+            left_action_items: [["earth", lambda x: app.back_home_action()], ["chat-processing", lambda x: app.message_action()], ["account-multiple-outline"], ["account-circle", lambda x: app.profile_action()]]
             specific_text_color: app.theme_cls.primary_color
             specific_text_hue: app.theme_cls.primary_hue
             md_bg_color: 0,0,0,1
@@ -236,7 +248,7 @@
             text: "This is the Profile page where you can see your own posts. You can also edit your profile picture and banner here."
             halign: "center"
         MDTopAppBar:
-            left_action_items: [["earth", lambda x: app.back_home_action()], ["chat-processing", lambda x: app.back_message_action()], ["account-multiple-outline", lambda x: app.back_friends_action()], ["account-circle"]]
+            left_action_items: [["earth", lambda x: app.back_home_action()], ["chat-processing", lambda x: app.message_action()], ["account-multiple-outline", lambda x: app.friends_action()], ["account-circle"]]
             specific_text_color: app.theme_cls.primary_color
             specific_text_hue: app.theme_cls.primary_hue
             md_bg_color: 0,0,0,1
@@ -248,6 +260,7 @@
             icon_color: 0,0,0,1
             pos_hint: {'center_x':0.8, 'center_y':0.1}
             size_hint: (.2, .13)
+            on_release: app.editProfile_action()
 
 <SettingsScreen>
     name: 'settingsScreen'
@@ -255,7 +268,7 @@
         MDTopAppBar:
             title: "Settings"
             left_action_items: [["undo", lambda x: app.back_to_beforeScreen()]]
-            right_action_items: [["language-python", lambda x: app.changescreen_to_loginscreen()]]
+            right_action_items: [["", "", ""]]
             pos_hint: {'top': 1}
             specific_text_color: app.theme_cls.primary_color
             specific_text_hue: app.theme_cls.primary_hue
@@ -266,14 +279,68 @@
 
 <AddFriendScreen>
     name: 'addFriendScreen'
+    on_enter: app.display_allUsers()
     MDFloatLayout:
         MDTopAppBar:
             title: "Search"
             left_action_items: [["undo", lambda x: app.back_to_beforeScreen()]]
+            right_action_items: [["", "", ""]]
+            pos_hint: {'top': 1}
+            specific_text_color: app.theme_cls.primary_color
+            specific_text_hue: app.theme_cls.primary_hue
+            md_bg_color: 0,0,0,1
+        ScrollView:
+            pos_hint: {'center_x': 0.5, 'center_y': 0.4} 
+            size_hint: None, None
+            size: 300, 420 
+            MDList:
+                id: user_list
+                padding: dp(8), dp(8)
+                spacing: dp(8)
+                size_hint_y: None
+                height: self.minimum_height
+
+<CreatePostScreen>
+    name: 'createPostScreen'
+    MDFloatLayout:
+        MDTopAppBar:
+            title: "Create Post"
+            left_action_items: [["undo", lambda x: app.back_to_beforeScreen()]]
+            right_action_items: [["", "", ""]]
             pos_hint: {'top': 1}
             specific_text_color: app.theme_cls.primary_color
             specific_text_hue: app.theme_cls.primary_hue
             md_bg_color: 0,0,0,1
         MDLabel:
-            text: "This is the add friends page. You can search the database for a user here using their full name."
+            text: "This is the create post page. You can enter whatever you want and post it on your timeline."
+            halign: "center"
+
+<CreateMessageScreen>
+    name: 'createMessageScreen'
+    MDFloatLayout:
+        MDTopAppBar:
+            title: "Create Message"
+            left_action_items: [["undo", lambda x: app.back_to_beforeScreen()]]
+            right_action_items: [["", "", ""]]
+            pos_hint: {'top': 1}
+            specific_text_color: app.theme_cls.primary_color
+            specific_text_hue: app.theme_cls.primary_hue
+            md_bg_color: 0,0,0,1
+        MDLabel:
+            text: "This is the create message page. You can create your message here and pick a recipient based on your friends list."
+            halign: "center"
+
+<EditProfileScreen>
+    name: 'editProfileScreen'
+    MDFloatLayout:
+        MDTopAppBar:
+            title: "Edit Profile"
+            left_action_items: [["undo", lambda x: app.back_to_beforeScreen()]]
+            right_action_items: [["", "", ""]]
+            pos_hint: {'top': 1}
+            specific_text_color: app.theme_cls.primary_color
+            specific_text_hue: app.theme_cls.primary_hue
+            md_bg_color: 0,0,0,1
+        MDLabel:
+            text: "This is the edit profile page. You can edit your profile picture, username, first and lastname here."
             halign: "center"
