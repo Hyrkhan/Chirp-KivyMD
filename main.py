@@ -37,6 +37,7 @@ class PracticeApp(MDApp):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.dialog = None
+        self.logged_in_username = None
 
     def build(self):
         self.theme_cls.primary_palette = "Green"
@@ -109,7 +110,7 @@ class PracticeApp(MDApp):
         if self.dialog:
             self.dialog.dismiss()
 
-    def login_validation(self, username, password):   
+    def login_validation(self, username, password): 
         error_string = ""    
         if not username:
             error_string = "Please enter Username to Login"
@@ -120,10 +121,11 @@ class PracticeApp(MDApp):
             if result != "Proceed":
                 error_string = result 
             else:
+                self.logged_in_username = username
                 self.home_action() 
         if error_string:
             self.popup_error(error_string)
-
+        
     def username_password_validation(self, uname, password):
         conn = sqlite3.connect('practice_db.db')
         c = conn.cursor()
@@ -246,6 +248,7 @@ class PracticeApp(MDApp):
         screen_manager = self.root
         screen_manager.transition = NoTransition()
         screen_manager.current = 'profileScreen'
+        
 
     def back_to_beforeScreen(self):
         screen_manager = self.root
@@ -305,5 +308,24 @@ class PracticeApp(MDApp):
             addfriend_screen.ids.user_list.add_widget(
                 OneLineListItem(text=f"{user[1]} {user[2]}")
             )
+
+    def database_search_byUsername(self, username):
+        conn = sqlite3.connect('practice_db.db')
+        c = conn.cursor()
+        c.execute("SELECT * FROM users WHERE uname = ?", (username,))
+        result = c.fetchone()
+        conn.close()
+        return f"{result[1]} {result[2]}"
+
+    def display_userFullname(self):
+        profile_screen = self.root.get_screen('profileScreen')
+        profile_screen.ids.users_fullname.clear_widgets()  
+        profile_screen.ids.users_fullname.text = self.database_search_byUsername(self.logged_in_username)
+
+    def display_userUsername(self):
+        profile_screen = self.root.get_screen('profileScreen')
+        profile_screen.ids.users_username.clear_widgets()  
+        profile_screen.ids.users_username.text = f"({self.logged_in_username})"
+    
 
 PracticeApp().run()
