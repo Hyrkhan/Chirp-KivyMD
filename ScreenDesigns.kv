@@ -235,6 +235,8 @@
 
 <ProfileScreen>
     name: 'profileScreen'
+    on_enter: app.display_userFullname()
+    on_enter: app.display_userUsername()
     MDFloatLayout:
         MDTopAppBar:
             title: "Profile"
@@ -244,9 +246,23 @@
             specific_text_color: app.theme_cls.primary_color
             specific_text_hue: app.theme_cls.primary_hue
             md_bg_color: 0,0,0,1
+        MDCard:
+            radius: 50
+            pos_hint: {"center_x": .5, "center_y": 0.75}
+            size_hint: .3, .18
+            FitImage:
+                source: "images/enna.jpeg"
+                radius: 50, 50, 50, 50
         MDLabel:
-            text: "This is the Profile page where you can see your own posts. You can also edit your profile picture and banner here."
+            id: users_fullname
             halign: "center"
+            font_style: "H6"
+            pos_hint: {"center_x": .5, "center_y": 0.6}
+        MDLabel:
+            id: users_username
+            halign: "center"
+            font_style: "Subtitle1"
+            pos_hint: {"center_x": .5, "center_y": 0.55}
         MDTopAppBar:
             left_action_items: [["earth", lambda x: app.back_home_action()], ["chat-processing", lambda x: app.message_action()], ["account-multiple-outline", lambda x: app.friends_action()], ["account-circle"]]
             specific_text_color: app.theme_cls.primary_color
