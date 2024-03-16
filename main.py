@@ -42,45 +42,33 @@ class PracticeApp(MDApp):
     def build(self):
         self.theme_cls.primary_palette = "Green"
         self.theme_cls.primary_hue = "A700"
-
-        menu_list = [
-            {
-                "viewclass": "OneLineListItem",
-                "text": "Switch to Dark Mode",
-            },
-            {
-                "viewclass": "OneLineListItem",
-                "text": "Settings",
-                "on_release": lambda x = "Settings": self.settings_action()
-            }
-        ]
-        self.menu = MDDropdownMenu(
-            items = menu_list,
-            width_mult = 4
-        )
-
+        self.menu = self.create_menu()
         screen = Builder.load_file('ScreenDesigns.kv')
-        screen_manager = ScreenManager()
-        
-        screen_manager.add_widget(LoginScreen(name='loginScreen'))
-        screen_manager.add_widget(SignUpScreen(name='signUpScreen'))
-        screen_manager.add_widget(HomeScreen(name='homeScreen'))
-        screen_manager.add_widget(MessageScreen(name='messageScreen'))
-        screen_manager.add_widget(FriendScreen(name='friendScreen'))
-        screen_manager.add_widget(ProfileScreen(name='profileScreen'))
-        screen_manager.add_widget(SettingsScreen(name="settingsScreen"))
-        screen_manager.add_widget(AddFriendScreen(name="addFriendScreen"))
-        screen_manager.add_widget(CreatePostScreen(name="createPostScreen"))
-        screen_manager.add_widget(CreateMessageScreen(name="createMessageScreen"))
-        screen_manager.add_widget(EditProfileScreen(name="editProfileScreen"))
-
+        screen_manager = self.create_screen_manager()
         self.create_table()
         return screen_manager
-
-    def dropdown(self, button):
-        self.menu.caller = button
-        self.menu.open()
         
+    def create_menu(self):
+        menu_list = [
+            {"viewclass": "OneLineListItem", "text": "Switch to Dark Mode"},
+            {"viewclass": "OneLineListItem", "text": "Settings", "on_release": lambda x = "Settings": self.settings_action()}
+        ]
+        return MDDropdownMenu(items=menu_list, width_mult=4)
+
+    def create_screen_manager(self):
+        screen_manager = ScreenManager()
+        screens = [
+            LoginScreen(name='loginScreen'), SignUpScreen(name='signUpScreen'),
+            HomeScreen(name='homeScreen'), MessageScreen(name='messageScreen'),
+            FriendScreen(name='friendScreen'), ProfileScreen(name='profileScreen'),
+            SettingsScreen(name="settingsScreen"), AddFriendScreen(name="addFriendScreen"),
+            CreatePostScreen(name="createPostScreen"), CreateMessageScreen(name="createMessageScreen"),
+            EditProfileScreen(name="editProfileScreen")
+        ]
+        for screen in screens:
+            screen_manager.add_widget(screen)
+        return screen_manager
+    
     def create_table(self):
         conn = sqlite3.connect('practice_db.db')
         c = conn.cursor()
