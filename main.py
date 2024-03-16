@@ -6,7 +6,7 @@ from kivy.uix.screenmanager import Screen, ScreenManager, SlideTransition, NoTra
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.button import MDFlatButton
 from kivymd.uix.menu import MDDropdownMenu
-from kivymd.uix.list import OneLineListItem
+from kivymd.uix.list import  ImageLeftWidget, OneLineAvatarIconListItem, IconRightWidget
 import sqlite3
 import re
 
@@ -306,7 +306,15 @@ class PracticeApp(MDApp):
         users = self.get_users_from_database()
         for user in users:
             addfriend_screen.ids.user_list.add_widget(
-                OneLineListItem(text=f"{user[1]} {user[2]}")
+                OneLineAvatarIconListItem(
+                    ImageLeftWidget(
+                        source="images/M0.png"
+                    ),
+                    IconRightWidget(
+                        icon="plus"
+                    ),
+                    text=f"{user[1]} {user[2]}",
+                )
             )
 
     def database_search_byUsername(self, username):
