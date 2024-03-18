@@ -45,7 +45,7 @@ class PracticeApp(MDApp):
         self.menu = self.create_menu()
         screen = Builder.load_file('ScreenDesigns.kv')
         screen_manager = self.create_screen_manager()
-        self.create_table()
+        self.create_allTables()
         return screen_manager
         
     def create_menu(self):
@@ -69,7 +69,15 @@ class PracticeApp(MDApp):
             screen_manager.add_widget(screen)
         return screen_manager
     
-    def create_table(self):
+    def dropdown(self, button):
+        self.menu.caller = button
+        self.menu.open()
+
+    def create_allTables(self):
+        self.create_usertable()
+        self.create_profPictable()
+
+    def create_usertable(self):
         conn = sqlite3.connect('practice_db.db')
         c = conn.cursor()
         c.execute("""CREATE TABLE IF NOT EXISTS users(
@@ -80,6 +88,19 @@ class PracticeApp(MDApp):
                   email TEXT,
                   password TEXT
                   )""")
+        
+        conn.commit()
+        conn.close()
+
+    def create_profPictable(self):
+        conn = sqlite3.connect('practice_db.db')
+        c = conn.cursor()
+        c.execute("""CREATE TABLE IF NOT EXISTS profpic(
+                id INTEGER PRIMARY KEY,
+                userid INTEGER,
+                profpicNum INTEGER,
+                FOREIGN KEY (userid) REFERENCES users(id)
+                )""")
         
         conn.commit()
         conn.close()
@@ -162,6 +183,10 @@ class PracticeApp(MDApp):
                       'email': email,
                       'password': password,
                   })
+        
+        userid = c.lastrowid
+        c.execute("INSERT INTO profpic (userid, profpicNum) VALUES (?, 1)", (userid,))
+
         print("Register successfull")
         conn.commit()
         conn.close()
@@ -293,10 +318,13 @@ class PracticeApp(MDApp):
         addfriend_screen.ids.user_list.clear_widgets()  # Clear existing users
         users = self.get_users_from_database()
         for user in users:
+            profpicNum = self.get_profpicNum_from_database(user[0])
+            image = f"images/DP{profpicNum}.jpg"
+
             addfriend_screen.ids.user_list.add_widget(
                 OneLineAvatarIconListItem(
                     ImageLeftWidget(
-                        source="images/M0.png"
+                        source = image
                     ),
                     IconRightWidget(
                         icon="plus"
@@ -311,17 +339,33 @@ class PracticeApp(MDApp):
         c.execute("SELECT * FROM users WHERE uname = ?", (username,))
         result = c.fetchone()
         conn.close()
-        return f"{result[1]} {result[2]}"
+        return result
+
+    def get_profpicNum_from_database(self, userid):
+        conn = sqlite3.connect('practice_db.db')
+        c = conn.cursor()
+        c.execute("SELECT profpicNum FROM profpic WHERE userid = ?", (userid,))
+        profpicNum = c.fetchone()[0] 
+        conn.close()
+        return profpicNum
+
+    def get_profile_pic(self):
+        user_data = self.database_search_byUsername(self.logged_in_username)
+        if user_data:
+            profpicNum = self.get_profpicNum_from_database(user_data[0])
+            return f"images/DP{profpicNum}.jpg"
+        else:
+            return "images/DP1.jpg"
 
     def display_userFullname(self):
         profile_screen = self.root.get_screen('profileScreen')
         profile_screen.ids.users_fullname.clear_widgets()  
-        profile_screen.ids.users_fullname.text = self.database_search_byUsername(self.logged_in_username)
+        fullname = self.database_search_byUsername(self.logged_in_username)
+        profile_screen.ids.users_fullname.text = f"{fullname[1]} {fullname[2]}"
 
     def display_userUsername(self):
         profile_screen = self.root.get_screen('profileScreen')
         profile_screen.ids.users_username.clear_widgets()  
         profile_screen.ids.users_username.text = f"({self.logged_in_username})"
     
-
 PracticeApp().run()
