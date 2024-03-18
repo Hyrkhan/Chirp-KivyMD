@@ -246,13 +246,14 @@
             specific_text_color: app.theme_cls.primary_color
             specific_text_hue: app.theme_cls.primary_hue
             md_bg_color: 0,0,0,1
-        MDCard:
-            radius: 50
+        MDIconButton:
             pos_hint: {"center_x": .5, "center_y": 0.75}
+            radius: (50, 50)
             size_hint: .3, .18
+            on_release: app.changescreen_to_loginscreen()
             FitImage:
-                source: "images/F2.jpg"
-                radius: 50, 50, 50, 50
+                source: app.get_profile_pic()
+                radius: 60, 60, 60, 60
         MDLabel:
             id: users_fullname
             halign: "center"
