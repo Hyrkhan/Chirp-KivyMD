@@ -261,7 +261,11 @@ class PracticeApp(MDApp):
         screen_manager = self.root
         screen_manager.transition = NoTransition()
         screen_manager.current = 'profileScreen'
-        
+        self.update_profile_image()
+    
+    def back_to_profile(self):
+        self.back_to_beforeScreen()
+        self.update_profile_image()
 
     def back_to_beforeScreen(self):
         screen_manager = self.root
@@ -324,7 +328,8 @@ class PracticeApp(MDApp):
             addfriend_screen.ids.user_list.add_widget(
                 OneLineAvatarIconListItem(
                     ImageLeftWidget(
-                        source = image
+                        source = image,
+                        radius = [60, 60, 60, 60]
                     ),
                     IconRightWidget(
                         icon="plus"
@@ -368,4 +373,20 @@ class PracticeApp(MDApp):
         profile_screen.ids.users_username.clear_widgets()  
         profile_screen.ids.users_username.text = f"({self.logged_in_username})"
     
+    def edit_profile_pic(self, dpNum):
+        user_data = self.database_search_byUsername(self.logged_in_username)
+        if user_data:
+            conn = sqlite3.connect('practice_db.db')
+            c = conn.cursor()
+            c.execute("UPDATE profpic SET profpicNum = ? WHERE userid = ?", (dpNum, user_data[0],))
+            conn.commit()
+            conn.close()
+        else:
+            pass
+
+    def update_profile_image(self):
+        profile_screen = self.root.get_screen('profileScreen')
+        profile_image = profile_screen.ids.profile_image
+        profile_image.source = self.get_profile_pic()
+
 PracticeApp().run()
