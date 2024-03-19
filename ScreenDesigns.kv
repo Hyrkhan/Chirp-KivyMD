@@ -246,12 +246,12 @@
             specific_text_color: app.theme_cls.primary_color
             specific_text_hue: app.theme_cls.primary_hue
             md_bg_color: 0,0,0,1
-        MDIconButton:
+        MDCard:
             pos_hint: {"center_x": .5, "center_y": 0.75}
-            radius: (50, 50)
+            radius: 50
             size_hint: .3, .18
-            on_release: app.changescreen_to_loginscreen()
             FitImage:
+                id: profile_image
                 source: app.get_profile_pic()
                 radius: 60, 60, 60, 60
         MDLabel:
@@ -359,12 +359,57 @@
     MDFloatLayout:
         MDTopAppBar:
             title: "Edit Profile"
-            left_action_items: [["undo", lambda x: app.back_to_beforeScreen()]]
+            left_action_items: [["undo", lambda x: app.back_to_profile()]]
             right_action_items: [["", "", ""]]
             pos_hint: {'top': 1}
             specific_text_color: app.theme_cls.primary_color
             specific_text_hue: app.theme_cls.primary_hue
             md_bg_color: 0,0,0,1
-        MDLabel:
-            text: "This is the edit profile page. You can edit your profile picture, username, first and lastname here."
-            halign: "center"
+        MDIconButton:
+            pos_hint: {"center_x": .15, "center_y": 0.75}
+            radius: (50, 50)
+            size_hint: .3, .18
+            on_release: app.edit_profile_pic(1)
+            FitImage:
+                source: "images/DP1.jpg"
+                radius: 60, 60, 60, 60
+        MDIconButton:
+            pos_hint: {"center_x": .5, "center_y": 0.75}
+            radius: (50, 50)
+            size_hint: .3, .18
+            on_release: app.edit_profile_pic(2)
+            FitImage:
+                source: "images/DP2.jpg"
+                radius: 60, 60, 60, 60
+        MDIconButton:
+            pos_hint: {"center_x": .85, "center_y": 0.75}
+            radius: (50, 50)
+            size_hint: .3, .18
+            on_release: app.edit_profile_pic(3)
+            FitImage:
+                source: "images/DP3.jpg"
+                radius: 60, 60, 60, 60
+        MDIconButton:
+            pos_hint: {"center_x": .15, "center_y": 0.55}
+            radius: (50, 50)
+            size_hint: .3, .18
+            on_release: app.edit_profile_pic(4)
+            FitImage:
+                source: "images/DP4.jpg"
+                radius: 60, 60, 60, 60
+        MDIconButton:
+            pos_hint: {"center_x": .5, "center_y": 0.55}
+            radius: (50, 50)
+            size_hint: .3, .18
+            on_release: app.edit_profile_pic(5)
+            FitImage:
+                source: "images/DP5.jpg"
+                radius: 60, 60, 60, 60
+        MDIconButton:
+            pos_hint: {"center_x": .85, "center_y": 0.55}
+            radius: (50, 50)
+            size_hint: .3, .18
+            on_release: app.edit_profile_pic(6)
+            FitImage:
+                source: "images/DP6.jpg"
+                radius: 60, 60, 60, 60
