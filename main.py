@@ -76,6 +76,7 @@ class PracticeApp(MDApp):
     def create_allTables(self):
         self.create_usertable()
         self.create_profPictable()
+        self.create_userFollowtable()
 
     def create_usertable(self):
         conn = sqlite3.connect('practice_db.db')
@@ -100,6 +101,20 @@ class PracticeApp(MDApp):
                 userid INTEGER,
                 profpicNum INTEGER,
                 FOREIGN KEY (userid) REFERENCES users(id)
+                )""")
+        
+        conn.commit()
+        conn.close()
+
+    def create_userFollowtable(self):
+        conn = sqlite3.connect('practice_db.db')
+        c = conn.cursor()
+        c.execute("""CREATE TABLE IF NOT EXISTS follows(
+                id INTEGER PRIMARY KEY,
+                userAid INTEGER,
+                userBid INTEGER,
+                FOREIGN KEY (userAid) REFERENCES users(id),
+                FOREIGN KEY (userBid) REFERENCES users(id)
                 )""")
         
         conn.commit()
@@ -316,11 +331,32 @@ class PracticeApp(MDApp):
         users = c.fetchall()
         conn.close()
         return users
+    
+    def add_userAction(self, userBid):
+        user_data = self.database_search_byUsername(self.logged_in_username)
+        userAid = user_data[0]
+        if userAid != userBid:
+            conn = sqlite3.connect('practice_db.db')
+            c = conn.cursor()
+            c.execute("INSERT into follows (userAid, userBid) VALUES (? , ?)", (userAid, userBid,))
+            conn.commit()
+            conn.close()
+            print("Add success!")
 
-    def display_allUsers(self):
+    def display_allUsers(self, search_query=None):
         addfriend_screen = self.root.get_screen('addFriendScreen')
         addfriend_screen.ids.user_list.clear_widgets()  # Clear existing users
-        users = self.get_users_from_database()
+        conn = sqlite3.connect('practice_db.db')
+        c = conn.cursor()
+
+        if search_query:
+            c.execute("SELECT * FROM users WHERE fname LIKE ? OR lname LIKE ?", ('%' + search_query + '%', '%' + search_query + '%'))
+        else:
+            c.execute("SELECT * FROM users")
+
+        users = c.fetchall()
+        conn.close()
+
         for user in users:
             profpicNum = self.get_profpicNum_from_database(user[0])
             image = f"images/DP{profpicNum}.jpg"
@@ -328,15 +364,19 @@ class PracticeApp(MDApp):
             addfriend_screen.ids.user_list.add_widget(
                 OneLineAvatarIconListItem(
                     ImageLeftWidget(
-                        source = image,
-                        radius = [60, 60, 60, 60]
+                        source=image,
+                        radius=[60, 60, 60, 60]
                     ),
                     IconRightWidget(
-                        icon="plus"
+                        icon="plus",
+                        on_release=lambda x, userBid=user[0]: self.add_userAction(userBid)
                     ),
                     text=f"{user[1]} {user[2]}",
                 )
             )
+
+    def on_search(self, instance, value):
+        self.display_allUsers(value.strip())
 
     def database_search_byUsername(self, username):
         conn = sqlite3.connect('practice_db.db')
@@ -381,6 +421,7 @@ class PracticeApp(MDApp):
             c.execute("UPDATE profpic SET profpicNum = ? WHERE userid = ?", (dpNum, user_data[0],))
             conn.commit()
             conn.close()
+            self.popup_sucess("Profile Picture")
         else:
             pass
 
@@ -388,5 +429,44 @@ class PracticeApp(MDApp):
         profile_screen = self.root.get_screen('profileScreen')
         profile_image = profile_screen.ids.profile_image
         profile_image.source = self.get_profile_pic()
+
+    def popup_sucess(self, string):
+        close_button = MDFlatButton(text="Close", on_release=self.close_dialog)
+
+        self.dialog = MDDialog(
+            title="Edit Successful!",
+            text = "Successfully edited your "+string+"!",
+            buttons= [close_button]
+        )
+        self.dialog.open()
+
+    def popup_editWarning(self, fname, lname, uname, password):
+        no_button = MDFlatButton(text="No", on_release = self.close_dialog)
+        yes_button = MDFlatButton(text="Yes", on_release = lambda x: self.edit_changes(fname, lname, uname, password))
+
+        self.dialog = MDDialog(
+            title="Are you sure?",
+            text = "Do you really want to make these changes?",
+            buttons= [yes_button, no_button]
+        )
+        self.dialog.open()
+
+    def edit_changes(self, fname, lname, uname, password):
+        user_data = self.database_search_byUsername(self.logged_in_username)
+        print(fname, lname, uname, password)
+        '''
+        conn = sqlite3.connect('practice_db.db')
+        c = conn.cursor()
+        if fname is not None:
+            c.execute("UPDATE users SET fname = ? WHERE userid = ?", (fname, user_data[0],))
+        if lname is not None:
+            c.execute("UPDATE users SET lname = ? WHERE userid = ?", (lname, user_data[0],))
+        if uname is not None:
+            c.execute("UPDATE users SET uname = ? WHERE userid = ?", (uname, user_data[0],))
+        if password is not None:
+            c.execute("UPDATE users SET password = ? WHERE userid = ?", (password, user_data[0],))
+        conn.commit()
+        conn.close()
+        '''
 
 PracticeApp().run()
