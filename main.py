@@ -469,4 +469,53 @@ class PracticeApp(MDApp):
         conn.close()
         '''
 
+    def display_friendsList(self):
+        addfriend_screen = self.root.get_screen('friendScreen')
+        addfriend_screen.ids.friends_list.clear_widgets()  # Clear existing users
+        user_data = self.database_search_byUsername(self.logged_in_username)
+        conn = sqlite3.connect('practice_db.db')
+        c = conn.cursor()
+        c.execute("SELECT * FROM follows WHERE userAid = ?", (user_data[0],))
+
+        friends = c.fetchall()
+        conn.close()
+
+        for friend in friends:
+            user = self.database_search_byUserid(friend[2])
+            profpicNum = self.get_profpicNum_from_database(friend[2])
+            image = f"images/DP{profpicNum}.jpg"
+
+            addfriend_screen.ids.friends_list.add_widget(
+                OneLineAvatarIconListItem(
+                    ImageLeftWidget(
+                        source=image,
+                        radius=[60, 60, 60, 60]
+                    ),
+                    IconRightWidget(
+                        icon="minus",
+                        on_release=lambda x, userBid=user[0]: self.delete_userAction(userBid)
+                    ),
+                    text=f"{user[1]} {user[2]}",
+                )
+            )
+
+    def database_search_byUserid(self, userid):
+        conn = sqlite3.connect('practice_db.db')
+        c = conn.cursor()
+        c.execute("SELECT * FROM users WHERE id = ?", (userid,))
+        result = c.fetchone()
+        conn.close()
+        return result
+
+    def delete_userAction(self, userBid):
+        user_data = self.database_search_byUsername(self.logged_in_username)
+        userAid = user_data[0]
+        if userAid != userBid:
+            conn = sqlite3.connect('practice_db.db')
+            c = conn.cursor()
+            c.execute("DELETE FROM follows WHERE userAid = ? AND userBid = ?", (userAid, userBid,))
+            conn.commit()
+            conn.close()
+            print("Delete success!")
+
 PracticeApp().run()
