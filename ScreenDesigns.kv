@@ -206,6 +206,7 @@
 
 <FriendScreen>
     name: 'friendScreen'
+    on_enter: app.display_friendsList()
     MDFloatLayout:
         MDTopAppBar:
             title: "Friends"
@@ -215,9 +216,16 @@
             specific_text_color: app.theme_cls.primary_color
             specific_text_hue: app.theme_cls.primary_hue
             md_bg_color: 0,0,0,1
-        MDLabel:
-            text: "No Friends?"
-            halign: "center"
+        ScrollView:
+            pos_hint: {'center_x': 0.5, 'center_y': 0.48} 
+            size_hint: None, None
+            size: 320, 470 
+            MDList:
+                id: friends_list
+                padding: dp(8), dp(8)
+                spacing: dp(8)
+                size_hint_y: None
+                height: self.minimum_height
         MDTopAppBar:
             left_action_items: [["earth", lambda x: app.back_home_action()], ["chat-processing", lambda x: app.message_action()], ["account-multiple-outline"], ["account-circle", lambda x: app.profile_action()]]
             specific_text_color: app.theme_cls.primary_color
