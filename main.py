@@ -356,24 +356,43 @@ class PracticeApp(MDApp):
 
         users = c.fetchall()
         conn.close()
+        current_user = self.database_search_byUsername(self.logged_in_username)
 
         for user in users:
-            profpicNum = self.get_profpicNum_from_database(user[0])
-            image = f"images/DP{profpicNum}.jpg"
+            if current_user[0] == user[0]:
+                continue
+            elif self.isFollowed(user[0]):
+                continue
+            else:
+                profpicNum = self.get_profpicNum_from_database(user[0])
+                image = f"images/DP{profpicNum}.jpg"
 
-            addfriend_screen.ids.user_list.add_widget(
-                OneLineAvatarIconListItem(
-                    ImageLeftWidget(
-                        source=image,
-                        radius=[60, 60, 60, 60]
-                    ),
-                    IconRightWidget(
-                        icon="plus",
-                        on_release=lambda x, userBid=user[0]: self.add_userAction(userBid)
-                    ),
-                    text=f"{user[1]} {user[2]}",
+                addfriend_screen.ids.user_list.add_widget(
+                    OneLineAvatarIconListItem(
+                        ImageLeftWidget(
+                            source=image,
+                            radius=[60, 60, 60, 60]
+                        ),
+                        IconRightWidget(
+                            icon="plus",
+                            on_release=lambda x, userBid=user[0]: self.add_userAction(userBid)
+                        ),
+                        text=f"{user[1]} {user[2]}",
+                    )
                 )
-            )
+
+    def isFollowed(self, userBid):
+        userAid = self.database_search_byUsername(self.logged_in_username)[0]
+        conn = sqlite3.connect('practice_db.db')
+        c = conn.cursor()
+        c.execute("SELECT userBid FROM follows WHERE userAid = ?", (userAid,))
+        result = c.fetchall()
+        conn.close()
+        all_userBid = [id for sublist in result for id in sublist]
+        if userBid in all_userBid:
+            return True
+        else:
+            return False
 
     def on_search(self, instance, value):
         self.display_allUsers(value.strip())
