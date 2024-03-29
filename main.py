@@ -309,6 +309,7 @@ class PracticeApp(MDApp):
         screen_manager.transition = SlideTransition()
         screen_manager.transition.direction = 'left'
         screen_manager.current = 'createPostScreen'
+        self.update_profile_image()
 
     def createMessage_action(self):
         screen_manager = self.root
@@ -421,11 +422,17 @@ class PracticeApp(MDApp):
         else:
             return "images/DP1.jpg"
 
-    def display_userFullname(self):
-        profile_screen = self.root.get_screen('profileScreen')
-        profile_screen.ids.users_fullname.clear_widgets()  
-        fullname = self.database_search_byUsername(self.logged_in_username)
-        profile_screen.ids.users_fullname.text = f"{fullname[1]} {fullname[2]}"
+    def display_userFullname(self, screen):
+        user_data = self.database_search_byUsername(self.logged_in_username)
+        fullname = f"{user_data[1]} {user_data[2]}"
+        if screen == "profileScreen":
+            profile_screen = self.root.get_screen('profileScreen')
+            profile_screen.ids.users_fullname.clear_widgets()  
+            profile_screen.ids.users_fullname.text = fullname
+        elif screen == "createPostScreen":
+            profile_screen = self.root.get_screen('createPostScreen')
+            profile_screen.ids.users_fullname.clear_widgets()  
+            profile_screen.ids.users_fullname.text = fullname
 
     def display_userUsername(self):
         profile_screen = self.root.get_screen('profileScreen')
@@ -446,8 +453,11 @@ class PracticeApp(MDApp):
 
     def update_profile_image(self):
         profile_screen = self.root.get_screen('profileScreen')
+        profile_screen2 = self.root.get_screen('createPostScreen')
         profile_image = profile_screen.ids.profile_image
+        profile_image2 = profile_screen2.ids.profile_image
         profile_image.source = self.get_profile_pic()
+        profile_image2.source = self.get_profile_pic()
 
     def popup_sucess(self, string):
         close_button = MDFlatButton(text="Close", on_release=self.close_dialog)
