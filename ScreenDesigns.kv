@@ -243,7 +243,7 @@
 
 <ProfileScreen>
     name: 'profileScreen'
-    on_enter: app.display_userFullname()
+    on_enter: app.display_userFullname("profileScreen")
     on_enter: app.display_userUsername()
     MDFloatLayout:
         MDTopAppBar:
@@ -335,6 +335,7 @@
 
 <CreatePostScreen>
     name: 'createPostScreen'
+    on_enter: app.display_userFullname("createPostScreen")
     MDFloatLayout:
         MDTopAppBar:
             title: "Create Post"
@@ -344,9 +345,53 @@
             specific_text_color: app.theme_cls.primary_color
             specific_text_hue: app.theme_cls.primary_hue
             md_bg_color: 0,0,0,1
-        MDLabel:
-            text: "This is the create post page. You can enter whatever you want and post it on your timeline."
-            halign: "center"
+        MDCard:
+            style: "filled"
+            pos_hint: {"center_x": .5, "center_y": .55}
+            size_hint: None, None
+            size: "270dp", "280dp"
+            # Sets custom properties.
+            theme_bg_color: "Custom"
+            md_bg_color: "black"
+
+            MDFloatLayout:
+                MDCard:
+                    pos_hint: {"center_x": .15, "center_y": 0.85}
+                    radius: 50
+                    size_hint: .13, .13
+                    FitImage:
+                        id: profile_image
+                        source: app.get_profile_pic()
+                        radius: 60, 60, 60, 60
+                MDLabel:
+                    pos_hint: {"center_x": .5, "center_y": .85}
+                    id: users_fullname
+                    adaptive_size: True
+                    color: "white"
+                    pos: "12dp", "12dp"
+                MDCard:
+                    style: "filled"
+                    pos_hint: {"center_x": .5, "center_y": .4}
+                    size_hint: None, None
+                    size: "250dp", "170dp"
+                    # Sets custom properties.
+                    theme_bg_color: "Custom"
+                    md_bg_color: "white"
+                    MDTextField:
+                        halign: "center"
+                        pos_hint: {"center_x": .5, "center_y": .5}
+                        multiline: True
+                        max_text_length: 95
+        MDRectangleFlatButton:
+            pos_hint: {"center_x": .5, "center_y": .25}
+            md_bg_color: 0,0,0,1
+            line_color: 0,0,0,1
+            text_color: "white"
+            text: "Post" 
+            font_size: 20
+            size_hint_x: 0.75
+            size_hint_y: 0.08
+                    
 
 <CreateMessageScreen>
     name: 'createMessageScreen'
