@@ -378,6 +378,7 @@
                     theme_bg_color: "Custom"
                     md_bg_color: "white"
                     MDTextField:
+                        id: content_input
                         halign: "center"
                         pos_hint: {"center_x": .5, "center_y": .5}
                         multiline: True
@@ -391,6 +392,7 @@
             font_size: 20
             size_hint_x: 0.75
             size_hint_y: 0.08
+            on_release: app.create_post(content_input.text)
                     
 
 <CreateMessageScreen>
