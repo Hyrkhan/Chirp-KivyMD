@@ -9,6 +9,7 @@ from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.list import  ImageLeftWidget, OneLineAvatarIconListItem, IconRightWidget
 import sqlite3
 import re
+import datetime
 
 class LoginScreen(Screen):
     pass
@@ -77,6 +78,8 @@ class PracticeApp(MDApp):
         self.create_usertable()
         self.create_profPictable()
         self.create_userFollowtable()
+        self.create_userPoststable()
+
 
     def create_usertable(self):
         conn = sqlite3.connect('practice_db.db')
@@ -115,6 +118,20 @@ class PracticeApp(MDApp):
                 userBid INTEGER,
                 FOREIGN KEY (userAid) REFERENCES users(id),
                 FOREIGN KEY (userBid) REFERENCES users(id)
+                )""")
+        
+        conn.commit()
+        conn.close()
+
+    def create_userPoststable(self):
+        conn = sqlite3.connect('practice_db.db')
+        c = conn.cursor()
+        c.execute("""CREATE TABLE IF NOT EXISTS posts(
+                id INTEGER PRIMARY KEY,
+                poster_userID INTEGER,
+                content TEXT,
+                date TIMESTAMP,
+                FOREIGN KEY (poster_userID) REFERENCES users(id)
                 )""")
         
         conn.commit()
@@ -546,5 +563,21 @@ class PracticeApp(MDApp):
             conn.commit()
             conn.close()
             print("Delete success!")
+    
+    def create_post(self, content = ""):
+        user_data = self.database_search_byUsername(self.logged_in_username)
+        current_date = self.get_currentTime()
+        if len(content) <= 95:
+            conn = sqlite3.connect('practice_db.db')
+            c = conn.cursor()
+            c.execute("INSERT into posts (poster_userID, content, date) VALUES (?, ?, ?)", (user_data[0], content, current_date,))
+            conn.commit()
+            conn.close()
+            print("Post added to database!")
+        else:
+            print("Text length exceeded")
+
+    def get_currentTime(self):
+        return datetime.datetime.now()
 
 PracticeApp().run()
