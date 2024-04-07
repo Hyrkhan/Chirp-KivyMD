@@ -7,6 +7,10 @@ from kivymd.uix.dialog import MDDialog
 from kivymd.uix.button import MDFlatButton
 from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.list import  ImageLeftWidget, OneLineAvatarIconListItem, IconRightWidget
+from kivymd.uix.card import MDCard
+from kivymd.uix.label import MDLabel
+from kivymd.uix.floatlayout import MDFloatLayout
+from kivymd.uix.fitimage import FitImage
 import sqlite3
 import re
 import datetime
@@ -468,13 +472,73 @@ class PracticeApp(MDApp):
         else:
             pass
 
-    def update_profile_image(self):
+    def posts_card(self, screen, profIMG):
+        user_data = self.database_search_byUsername(self.logged_in_username)
+        fullname = f"{user_data[1]} {user_data[2]}"
+        # Create the profile image widget
+        prof_image = FitImage(
+            source = profIMG,
+            radius=[60, 60, 60, 60]
+        )
+        # Create a card for the profile image
+        profile_image_card = MDCard(
+            pos_hint={"center_x": .12, "center_y": 0.83},
+            radius=50,
+            size_hint=(.15, .22)
+        )
+        # Add the profile image widget to the profile image card
+        profile_image_card.add_widget(prof_image)
+        # Create the user's full name label widget
+        users_fullname_label = MDLabel(
+            text = fullname,
+            id="users_fullname",
+            adaptive_size=True,
+            theme_text_color="Custom",
+            text_color = "white",
+            pos_hint={"center_x": .5, "center_y": 0.83}
+        )
+        # Create a card for additional content
+        additional_content_card = MDCard(
+            style="filled",
+            pos_hint={"center_x": .5, "center_y": .37},
+            size_hint=(None, None),
+            size=(280, 120),
+            theme_bg_color="Custom",
+            md_bg_color="white"
+        )
+        # Create a layout to hold all the widgets
+        layout = MDFloatLayout()
+        # Add widgets to the layout
+        layout.add_widget(profile_image_card)
+        layout.add_widget(users_fullname_label)
+        layout.add_widget(additional_content_card)
+        # Create the main card to hold the layout
+        main_card = MDCard(
+            style="filled",
+            pos_hint={"center_x": .5},
+            size_hint=(None, None),
+            size=(300, 200),
+            theme_bg_color="Custom",
+            md_bg_color="black"
+        )
+        # Add the layout to the main card
+        main_card.add_widget(layout)
+        # Add the main card to the card items
+        screen.ids.card_items.add_widget(main_card)
+
+    def update_profile_image(self): 
         profile_screen = self.root.get_screen('profileScreen')
         profile_screen2 = self.root.get_screen('createPostScreen')
         profile_image = profile_screen.ids.profile_image
         profile_image2 = profile_screen2.ids.profile_image
         profile_image.source = self.get_profile_pic()
         profile_image2.source = self.get_profile_pic()
+
+        self.posts_card(profile_screen, profile_image.source)
+
+
+        
+
 
     def popup_sucess(self, string):
         close_button = MDFlatButton(text="Close", on_release=self.close_dialog)
