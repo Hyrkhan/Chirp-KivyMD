@@ -240,8 +240,9 @@
             pos_hint: {'center_x':0.8, 'center_y':0.1}
             size_hint: (.2, .13)
             on_release: app.addFriend_action()
-
+'''
 <CardItem@RelativeLayout>:
+    profile_image_source: ""
     MDCard:
         style: "filled"
         pos_hint: {"center_x": .5}
@@ -253,10 +254,9 @@
             MDCard:
                 pos_hint: {"center_x": .12, "center_y": 0.83}
                 radius: 50
-                size_hint: .13, .18
+                size_hint: .15, .22
                 FitImage:
-                    id: profile_image
-                    source: app.get_profile_pic()
+                    source: root.profile_image_source
                     radius: 60, 60, 60, 60
             MDLabel:
                 pos_hint: {"center_x": .5, "center_y": .85}
@@ -266,9 +266,9 @@
                 pos: "12dp", "12dp"
             MDCard:
                 style: "filled"
-                pos_hint: {"center_x": .5, "center_y": .4}
+                pos_hint: {"center_x": .5, "center_y": .37}
                 size_hint: None, None
-                size: 270, 100
+                size: 280, 120
                 theme_bg_color: "Custom"
                 md_bg_color: "white"
                 #MDTextField:
@@ -276,7 +276,7 @@
                     #halign: "center"
                     #pos_hint: {"center_x": .5, "center_y": .5}
                     #multiline: True
-                    #max_text_length: 95
+                    #max_text_length: 95'''
 
 <ProfileScreen>
     name: 'profileScreen'
@@ -315,11 +315,9 @@
             size_hint: None, None
             size: 350, 270 
             MDList:
-                padding: dp(0), dp(200), dp(0), dp(0)
+                id: card_items
+                padding: dp(25), dp(0), dp(0), dp(0)
                 spacing: dp(225)
-                CardItem:
-                CardItem:
-                CardItem:
 
         
         MDTopAppBar:
