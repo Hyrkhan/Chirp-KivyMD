@@ -472,23 +472,21 @@ class PracticeApp(MDApp):
         else:
             pass
 
-    def posts_card(self, screen, profIMG):
+    def posts_card(self, screen, profIMG, postContent):
         user_data = self.database_search_byUsername(self.logged_in_username)
         fullname = f"{user_data[1]} {user_data[2]}"
-        # Create the profile image widget
+
         prof_image = FitImage(
             source = profIMG,
             radius=[60, 60, 60, 60]
         )
-        # Create a card for the profile image
         profile_image_card = MDCard(
             pos_hint={"center_x": .12, "center_y": 0.83},
             radius=50,
             size_hint=(.15, .22)
         )
-        # Add the profile image widget to the profile image card
         profile_image_card.add_widget(prof_image)
-        # Create the user's full name label widget
+
         users_fullname_label = MDLabel(
             text = fullname,
             id="users_fullname",
@@ -497,7 +495,14 @@ class PracticeApp(MDApp):
             text_color = "white",
             pos_hint={"center_x": .5, "center_y": 0.83}
         )
-        # Create a card for additional content
+        posts_content = MDLabel(
+            text = postContent,
+            id = "postContent",
+            halign = "center",
+            size_hint=(None, None), 
+            size=(275, 110),  
+            pos_hint={"center_x": .5, "center_y": 0.5}
+        )
         additional_content_card = MDCard(
             style="filled",
             pos_hint={"center_x": .5, "center_y": .37},
@@ -506,13 +511,13 @@ class PracticeApp(MDApp):
             theme_bg_color="Custom",
             md_bg_color="white"
         )
-        # Create a layout to hold all the widgets
+        additional_content_card.add_widget(posts_content)
+
         layout = MDFloatLayout()
-        # Add widgets to the layout
         layout.add_widget(profile_image_card)
         layout.add_widget(users_fullname_label)
         layout.add_widget(additional_content_card)
-        # Create the main card to hold the layout
+
         main_card = MDCard(
             style="filled",
             pos_hint={"center_x": .5},
@@ -521,10 +526,23 @@ class PracticeApp(MDApp):
             theme_bg_color="Custom",
             md_bg_color="black"
         )
-        # Add the layout to the main card
         main_card.add_widget(layout)
-        # Add the main card to the card items
         screen.ids.card_items.add_widget(main_card)
+
+    def main_posts(self, screen, profIMG):
+        user_data = self.database_search_byUsername(self.logged_in_username)
+
+        conn = sqlite3.connect('practice_db.db')
+        c = conn.cursor()
+        c.execute("SELECT * FROM posts WHERE poster_userID = ?", (user_data[0],))
+        posts = c.fetchall()
+        conn.close()
+
+        for post in posts:
+            postContent = post[2]
+            timestamp = post[3]
+            self.posts_card(screen, profIMG, postContent)
+
 
     def update_profile_image(self): 
         profile_screen = self.root.get_screen('profileScreen')
@@ -534,11 +552,8 @@ class PracticeApp(MDApp):
         profile_image.source = self.get_profile_pic()
         profile_image2.source = self.get_profile_pic()
 
-        self.posts_card(profile_screen, profile_image.source)
-
-
-        
-
+        profile_screen.ids.card_items.clear_widgets()
+        self.main_posts(profile_screen, profile_image.source)
 
     def popup_sucess(self, string):
         close_button = MDFlatButton(text="Close", on_release=self.close_dialog)
