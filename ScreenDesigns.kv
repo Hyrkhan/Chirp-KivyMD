@@ -240,43 +240,43 @@
             pos_hint: {'center_x':0.8, 'center_y':0.1}
             size_hint: (.2, .13)
             on_release: app.addFriend_action()
-'''
-<CardItem@RelativeLayout>:
-    profile_image_source: ""
-    MDCard:
-        style: "filled"
-        pos_hint: {"center_x": .5}
-        size_hint: None, None
-        size: 300, 200
-        theme_bg_color: "Custom"
-        md_bg_color: "black"
-        MDFloatLayout:
-            MDCard:
-                pos_hint: {"center_x": .12, "center_y": 0.83}
-                radius: 50
-                size_hint: .15, .22
-                FitImage:
-                    source: root.profile_image_source
-                    radius: 60, 60, 60, 60
-            MDLabel:
-                pos_hint: {"center_x": .5, "center_y": .85}
-                id: users_fullname
-                adaptive_size: True
-                color: "white"
-                pos: "12dp", "12dp"
-            MDCard:
-                style: "filled"
-                pos_hint: {"center_x": .5, "center_y": .37}
-                size_hint: None, None
-                size: 280, 120
-                theme_bg_color: "Custom"
-                md_bg_color: "white"
+
+#<CardItem@RelativeLayout>:
+    #profile_image_source: ""
+    #MDCard:
+        #style: "filled"
+        #pos_hint: {"center_x": .5}
+        #size_hint: None, None
+        #size: 300, 200
+        #theme_bg_color: "Custom"
+        #md_bg_color: "black"
+        #MDFloatLayout:
+            #MDCard:
+                #pos_hint: {"center_x": .12, "center_y": 0.83}
+                #radius: 50
+                #size_hint: .15, .22
+                #FitImage:
+                    #source: root.profile_image_source
+                    #radius: 60, 60, 60, 60
+            #MDLabel:
+                #pos_hint: {"center_x": .5, "center_y": .85}
+                #id: users_fullname
+                #adaptive_size: True
+                #color: "white"
+                #pos: "12dp", "12dp"
+            #MDCard:
+                #style: "filled"
+                #pos_hint: {"center_x": .5, "center_y": .37}
+                #size_hint: None, None
+                #size: 280, 120
+                #theme_bg_color: "Custom"
+                #md_bg_color: "white"
                 #MDTextField:
                     #id: content_input
                     #halign: "center"
                     #pos_hint: {"center_x": .5, "center_y": .5}
                     #multiline: True
-                    #max_text_length: 95'''
+                    #max_text_length: 95
 
 <ProfileScreen>
     name: 'profileScreen'
@@ -317,7 +317,7 @@
             MDList:
                 id: card_items
                 padding: dp(25), dp(0), dp(0), dp(0)
-                spacing: dp(225)
+                spacing: dp(25)
 
         
         MDTopAppBar:
