@@ -277,11 +277,13 @@ class PracticeApp(MDApp):
         screen_manager.transition.direction = 'left'
         screen_manager.current = 'homeScreen'
         self.close_dialog()
+        self.display_allPosts()
 
     def back_home_action(self):
         screen_manager = self.root
         screen_manager.transition = NoTransition()
         screen_manager.current = 'homeScreen'
+        self.display_allPosts()
 
     def message_action(self):
         screen_manager = self.root
@@ -387,21 +389,7 @@ class PracticeApp(MDApp):
                 continue
             else:
                 profpicNum = self.get_profpicNum_from_database(user[0])
-                image = f"images/DP{profpicNum}.jpg"
-
-                addfriend_screen.ids.user_list.add_widget(
-                    OneLineAvatarIconListItem(
-                        ImageLeftWidget(
-                            source=image,
-                            radius=[60, 60, 60, 60]
-                        ),
-                        IconRightWidget(
-                            icon="plus",
-                            on_release=lambda x, userBid=user[0]: self.add_userAction(userBid)
-                        ),
-                        text=f"{user[1]} {user[2]}",
-                    )
-                )
+                self.friendsList(addfriend_screen, "plus", user, profpicNum)
 
     def isFollowed(self, userBid):
         userAid = self.database_search_byUsername(self.logged_in_username)[0]
@@ -472,10 +460,7 @@ class PracticeApp(MDApp):
         else:
             pass
 
-    def posts_card(self, screen, profIMG, postContent):
-        user_data = self.database_search_byUsername(self.logged_in_username)
-        fullname = f"{user_data[1]} {user_data[2]}"
-
+    def posts_card(self, screen, profIMG, postContent, userFullname):
         prof_image = FitImage(
             source = profIMG,
             radius=[60, 60, 60, 60]
@@ -488,12 +473,22 @@ class PracticeApp(MDApp):
         profile_image_card.add_widget(prof_image)
 
         users_fullname_label = MDLabel(
-            text = fullname,
+            text = userFullname,
             id="users_fullname",
             adaptive_size=True,
             theme_text_color="Custom",
             text_color = "white",
-            pos_hint={"center_x": .5, "center_y": 0.83}
+            pos_hint={"center_x": .5, "center_y": 0.88}
+        )
+        posted_date = MDLabel(
+            text = "1hr ago",
+            id="post_date",
+            adaptive_size=True,
+            theme_text_color="Custom",
+            text_color = "white",
+            halign = "left",
+            font_style = "Caption",
+            pos_hint={"center_x": .5, "center_y": 0.75}
         )
         posts_content = MDLabel(
             text = postContent,
@@ -516,6 +511,7 @@ class PracticeApp(MDApp):
         layout = MDFloatLayout()
         layout.add_widget(profile_image_card)
         layout.add_widget(users_fullname_label)
+        layout.add_widget(posted_date)
         layout.add_widget(additional_content_card)
 
         main_card = MDCard(
@@ -529,9 +525,9 @@ class PracticeApp(MDApp):
         main_card.add_widget(layout)
         screen.ids.card_items.add_widget(main_card)
 
-    def main_posts(self, screen, profIMG):
-        user_data = self.database_search_byUsername(self.logged_in_username)
-
+    def main_posts(self, screen, profIMG, userID):
+        user_data = self.database_search_byUserid(userID)
+        fullname = f"{user_data[1]} {user_data[2]}"
         conn = sqlite3.connect('practice_db.db')
         c = conn.cursor()
         c.execute("SELECT * FROM posts WHERE poster_userID = ?", (user_data[0],))
@@ -541,19 +537,42 @@ class PracticeApp(MDApp):
         for post in posts:
             postContent = post[2]
             timestamp = post[3]
-            self.posts_card(screen, profIMG, postContent)
+            self.posts_card(screen, profIMG, postContent, fullname)
 
+    def display_allPosts(self):
+        current_user = self.database_search_byUsername(self.logged_in_username)
+        home_screen = self.root.get_screen('homeScreen')
+        home_screen.ids.card_items.clear_widgets()
+
+        conn = sqlite3.connect('practice_db.db')
+        c = conn.cursor()
+        c.execute("SELECT * FROM posts")
+        posts = c.fetchall()
+        c.execute("SELECT * FROM follows WHERE userAid = ?", (current_user[0],))
+        friends = c.fetchall()
+        conn.close()
+        friendsList = [x[2] for x in friends]
+        friendsList.append(current_user[0])
+        allPostersList = list(set([x[1] for x in posts]))
+
+        for poster in allPostersList:
+            if poster in friendsList:
+                profpicNum = self.get_profpicNum_from_database(poster)
+                image = f"images/DP{profpicNum}.jpg"
+                self.main_posts(home_screen, image, poster)
+                    
 
     def update_profile_image(self): 
         profile_screen = self.root.get_screen('profileScreen')
-        profile_screen2 = self.root.get_screen('createPostScreen')
+        createPost_screen = self.root.get_screen('createPostScreen')
         profile_image = profile_screen.ids.profile_image
-        profile_image2 = profile_screen2.ids.profile_image
+        profile_image2 = createPost_screen.ids.profile_image
         profile_image.source = self.get_profile_pic()
         profile_image2.source = self.get_profile_pic()
 
         profile_screen.ids.card_items.clear_widgets()
-        self.main_posts(profile_screen, profile_image.source)
+        user_data = self.database_search_byUsername(self.logged_in_username)
+        self.main_posts(profile_screen, profile_image.source, user_data[0])
 
     def popup_sucess(self, string):
         close_button = MDFlatButton(text="Close", on_release=self.close_dialog)
@@ -595,8 +614,8 @@ class PracticeApp(MDApp):
         '''
 
     def display_friendsList(self):
-        addfriend_screen = self.root.get_screen('friendScreen')
-        addfriend_screen.ids.friends_list.clear_widgets()  # Clear existing users
+        friend_screen = self.root.get_screen('friendScreen')
+        friend_screen.ids.user_list.clear_widgets()  # Clear existing users
         user_data = self.database_search_byUsername(self.logged_in_username)
         conn = sqlite3.connect('practice_db.db')
         c = conn.cursor()
@@ -608,21 +627,28 @@ class PracticeApp(MDApp):
         for friend in friends:
             user = self.database_search_byUserid(friend[2])
             profpicNum = self.get_profpicNum_from_database(friend[2])
-            image = f"images/DP{profpicNum}.jpg"
+            self.friendsList(friend_screen, "minus", user, profpicNum)
 
-            addfriend_screen.ids.friends_list.add_widget(
-                OneLineAvatarIconListItem(
-                    ImageLeftWidget(
-                        source=image,
-                        radius=[60, 60, 60, 60]
-                    ),
-                    IconRightWidget(
-                        icon="minus",
-                        on_release=lambda x, userBid=user[0]: self.delete_userAction(userBid)
-                    ),
-                    text=f"{user[1]} {user[2]}",
-                )
+    def friendsList(self, screen, iconName, user, profpicNum):
+        image = f"images/DP{profpicNum}.jpg"
+    
+        if iconName == "minus":
+            action = lambda x, userBid=user[0]: self.delete_userAction(userBid)
+        elif iconName == "plus":
+            action = lambda x, userBid=user[0]: self.add_userAction(userBid)
+        screen.ids.user_list.add_widget(
+            OneLineAvatarIconListItem(
+                ImageLeftWidget(
+                    source=image,
+                    radius=[60, 60, 60, 60]
+                ),
+                IconRightWidget(
+                    icon = iconName,
+                    on_release = action
+                ),
+                text=f"{user[1]} {user[2]}",
             )
+        )
 
     def database_search_byUserid(self, userid):
         conn = sqlite3.connect('practice_db.db')
