@@ -6,7 +6,7 @@ from kivy.uix.screenmanager import Screen, ScreenManager, SlideTransition, NoTra
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.button import MDFlatButton
 from kivymd.uix.menu import MDDropdownMenu
-from kivymd.uix.list import  ImageLeftWidget, OneLineAvatarIconListItem, IconRightWidget
+from kivymd.uix.list import  ImageLeftWidget, OneLineAvatarIconListItem, IconRightWidget, TwoLineAvatarIconListItem
 from kivymd.uix.card import MDCard
 from kivymd.uix.label import MDLabel
 from kivymd.uix.floatlayout import MDFloatLayout
@@ -289,6 +289,7 @@ class PracticeApp(MDApp):
         screen_manager = self.root
         screen_manager.transition = NoTransition()
         screen_manager.current = 'messageScreen'
+        self.displayUserMessages()
         
     def friends_action(self):
         screen_manager = self.root
@@ -647,6 +648,25 @@ class PracticeApp(MDApp):
                     on_release = action
                 ),
                 text=f"{user[1]} {user[2]}",
+            )
+        )
+
+    def displayUserMessages(self):
+        message_screen = self.root.get_screen('messageScreen')
+        message_screen.ids.message_list.clear_widgets()  # Clear existing users
+
+        for i in range (5):
+            self.messageFriendsList(message_screen)
+
+    def messageFriendsList(self, screen):
+        screen.ids.message_list.add_widget(
+            TwoLineAvatarIconListItem(
+                ImageLeftWidget(
+                    source= "images/DP3.jpg",
+                    radius=[60, 60, 60, 60]
+                ),
+                text=f"Test",
+                secondary_text = "This is a test message",
             )
         )
 
