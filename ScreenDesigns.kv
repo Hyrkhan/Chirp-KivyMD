@@ -184,16 +184,23 @@
     name: 'messageScreen'
     MDFloatLayout:
         MDTopAppBar:
-            title: "Message"
+            title: "Messages"
             left_action_items: [["language-python", lambda x: app.changescreen_to_loginscreen()]]
             right_action_items: [["menu", lambda x: app.dropdown(x)]]
             pos_hint: {'top': 1}
             specific_text_color: app.theme_cls.primary_color
             specific_text_hue: app.theme_cls.primary_hue
             md_bg_color: 0,0,0,1
-        MDLabel:
-            text: "This is the Messages page where all the messages you sent and received will show up"
-            halign: "center"
+        ScrollView:
+            pos_hint: {'center_x': 0.5, 'center_y': 0.48} 
+            size_hint: None, None
+            size: 320, 470 
+            MDList:
+                id: message_list
+                padding: dp(8), dp(8)
+                spacing: dp(8)
+                size_hint_y: None
+                height: self.minimum_height
         MDTopAppBar:
             left_action_items: [["earth", lambda x: app.back_home_action()], ["chat-processing"], ["account-multiple-outline", lambda x: app.friends_action()], ["account-circle", lambda x: app.profile_action()]]
             specific_text_color: app.theme_cls.primary_color
