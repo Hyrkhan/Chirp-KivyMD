@@ -37,6 +37,8 @@ class CreateMessageScreen(Screen):
     pass
 class EditProfileScreen(Screen):
     pass
+class MessageLogScreen(Screen):
+    pass
 
 class PracticeApp(MDApp):
     def __init__(self, **kwargs):
@@ -68,7 +70,7 @@ class PracticeApp(MDApp):
             FriendScreen(name='friendScreen'), ProfileScreen(name='profileScreen'),
             SettingsScreen(name="settingsScreen"), AddFriendScreen(name="addFriendScreen"),
             CreatePostScreen(name="createPostScreen"), CreateMessageScreen(name="createMessageScreen"),
-            EditProfileScreen(name="editProfileScreen")
+            EditProfileScreen(name="editProfileScreen"), MessageLogScreen(name="messageLogScreen")
         ]
         for screen in screens:
             screen_manager.add_widget(screen)
@@ -342,6 +344,13 @@ class PracticeApp(MDApp):
         screen_manager.transition.direction = 'left'
         screen_manager.current = 'createMessageScreen'
 
+    def messageLog_action(self):
+        screen_manager = self.root
+        self.beforeScreen = screen_manager.current
+        screen_manager.transition = SlideTransition()
+        screen_manager.transition.direction = 'left'
+        screen_manager.current = 'messageLogScreen'
+
     def editProfile_action(self):
         screen_manager = self.root
         self.beforeScreen = screen_manager.current
@@ -614,9 +623,7 @@ class PracticeApp(MDApp):
         conn.close()
         '''
 
-    def display_friendsList(self):
-        friend_screen = self.root.get_screen('friendScreen')
-        friend_screen.ids.user_list.clear_widgets()  # Clear existing users
+    def userFriends(self):
         user_data = self.database_search_byUsername(self.logged_in_username)
         conn = sqlite3.connect('practice_db.db')
         c = conn.cursor()
@@ -624,7 +631,13 @@ class PracticeApp(MDApp):
 
         friends = c.fetchall()
         conn.close()
+        return friends
 
+    def display_friendsList(self):
+        friend_screen = self.root.get_screen('friendScreen')
+        friend_screen.ids.user_list.clear_widgets()  # Clear existing users
+
+        friends = self.userFriends()
         for friend in friends:
             user = self.database_search_byUserid(friend[2])
             profpicNum = self.get_profpicNum_from_database(friend[2])
@@ -655,18 +668,23 @@ class PracticeApp(MDApp):
         message_screen = self.root.get_screen('messageScreen')
         message_screen.ids.message_list.clear_widgets()  # Clear existing users
 
-        for i in range (5):
-            self.messageFriendsList(message_screen)
+        friends = self.userFriends()
+        for friend in friends:
+            user = self.database_search_byUserid(friend[2])
+            profpicNum = self.get_profpicNum_from_database(friend[2])
+            self.messageFriendsList(message_screen, user, profpicNum)
 
-    def messageFriendsList(self, screen):
+    def messageFriendsList(self, screen, user, profpicNum):
+        image = f"images/DP{profpicNum}.jpg"
         screen.ids.message_list.add_widget(
             TwoLineAvatarIconListItem(
                 ImageLeftWidget(
-                    source= "images/DP3.jpg",
+                    source= image,
                     radius=[60, 60, 60, 60]
                 ),
-                text=f"Test",
+                text=f"{user[1]} {user[2]}",
                 secondary_text = "This is a test message",
+                on_release = lambda x: self.messageLog_action()
             )
         )
 
