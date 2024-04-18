@@ -453,7 +453,6 @@
             size_hint_y: 0.08
             on_release: app.create_post(content_input.text)
                     
-
 <CreateMessageScreen>
     name: 'createMessageScreen'
     MDFloatLayout:
@@ -467,6 +466,21 @@
             md_bg_color: 0,0,0,1
         MDLabel:
             text: "This is the create message page. You can create your message here and pick a recipient based on your friends list."
+            halign: "center"
+
+<MessageLogScreen>
+    name: 'messageLogScreen'
+    MDFloatLayout:
+        MDTopAppBar:
+            title: "Friend Name"
+            left_action_items: [["undo", lambda x: app.back_to_beforeScreen()]]
+            right_action_items: [["", "", ""]]
+            pos_hint: {'top': 1}
+            specific_text_color: app.theme_cls.primary_color
+            specific_text_hue: app.theme_cls.primary_hue
+            md_bg_color: 0,0,0,1
+        MDLabel:
+            text: "This is the message log"
             halign: "center"
 
 <EditProfileScreen>
