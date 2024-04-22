@@ -329,8 +329,6 @@
                 id: card_items
                 padding: dp(25), dp(0), dp(0), dp(0)
                 spacing: dp(25)
-
-        
         MDTopAppBar:
             left_action_items: [["earth", lambda x: app.back_home_action()], ["chat-processing", lambda x: app.message_action()], ["account-multiple-outline", lambda x: app.friends_action()], ["account-circle"]]
             specific_text_color: app.theme_cls.primary_color
@@ -472,6 +470,7 @@
     name: 'messageLogScreen'
     MDFloatLayout:
         MDTopAppBar:
+            id: messageLog_friendName
             title: "Friend Name"
             left_action_items: [["undo", lambda x: app.back_to_beforeScreen()]]
             right_action_items: [["", "", ""]]
@@ -479,9 +478,40 @@
             specific_text_color: app.theme_cls.primary_color
             specific_text_hue: app.theme_cls.primary_hue
             md_bg_color: 0,0,0,1
+        MDCard:
+            pos_hint: {"center_x": .87, "center_y": 0.945}
+            radius: 50
+            size_hint: (.14, .08)
+            FitImage:
+                id: messageLog_friendPic
+                radius: 60, 60, 60, 60
         MDLabel:
             text: "This is the message log"
             halign: "center"
+        MDTopAppBar:
+            specific_text_color: app.theme_cls.primary_color
+            specific_text_hue: app.theme_cls.primary_hue
+            md_bg_color: 0,0,0,1
+            MDCard:
+                style: "filled"
+                size_hint: None, None
+                size: "250dp", "60dp"
+                theme_bg_color: "Custom"
+                md_bg_color: "white"
+                MDTextField:
+                    mode: "rectangle"
+                    size_hint_x: None 
+                    width: 250
+                    theme_bg_color: "Custom"
+                    md_bg_color: "white"
+        MDIconButton:
+            icon: "send"
+            md_bg_color: app.theme_cls.primary_color
+            theme_icon_color: "Custom"
+            theme_text_color: "ContrastParentBackground"
+            icon_color: 0,0,0,1
+            pos_hint: {"center_x": .90, "center_y": 0.055}
+            size_hint: (.14, .08) 
 
 <EditProfileScreen>
     name: 'editProfileScreen'
