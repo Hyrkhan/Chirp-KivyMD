@@ -344,12 +344,18 @@ class PracticeApp(MDApp):
         screen_manager.transition.direction = 'left'
         screen_manager.current = 'createMessageScreen'
 
-    def messageLog_action(self):
+    def messageLog_action(self, title, image):
         screen_manager = self.root
         self.beforeScreen = screen_manager.current
         screen_manager.transition = SlideTransition()
         screen_manager.transition.direction = 'left'
         screen_manager.current = 'messageLogScreen'
+        self.messageLog_friendName(title, image)
+
+    def messageLog_friendName(self, title, image):
+        screen = self.root.get_screen('messageLogScreen')
+        screen.ids.messageLog_friendName.title = title
+        screen.ids.messageLog_friendPic.source = image
 
     def editProfile_action(self):
         screen_manager = self.root
@@ -684,7 +690,7 @@ class PracticeApp(MDApp):
                 ),
                 text=f"{user[1]} {user[2]}",
                 secondary_text = "This is a test message",
-                on_release = lambda x: self.messageLog_action()
+                on_release = lambda x, title = f"{user[1]} {user[2]}", sourceimage = image: self.messageLog_action(title, sourceimage)
             )
         )
 
