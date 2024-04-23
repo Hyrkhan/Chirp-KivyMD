@@ -85,7 +85,7 @@ class PracticeApp(MDApp):
         self.create_profPictable()
         self.create_userFollowtable()
         self.create_userPoststable()
-
+        self.create_messageTable()
 
     def create_usertable(self):
         conn = sqlite3.connect('practice_db.db')
@@ -140,6 +140,21 @@ class PracticeApp(MDApp):
                 FOREIGN KEY (poster_userID) REFERENCES users(id)
                 )""")
         
+        conn.commit()
+        conn.close()
+
+    def create_messageTable(self):
+        conn = sqlite3.connect('practice_db.db')
+        c = conn.cursor()
+        c.execute("""CREATE TABLE IF NOT EXISTS messages(
+                id INTEGER PRIMARY KEY,
+                senderID INTEGER,
+                receiverID INTEGER,
+                messageText TEXT,
+                date TIMESTAMP,
+                FOREIGN KEY (senderID) REFERENCES users(id),
+                FOREIGN KEY (receiverID) REFERENCES users(id)
+                )""")  
         conn.commit()
         conn.close()
 
@@ -344,18 +359,19 @@ class PracticeApp(MDApp):
         screen_manager.transition.direction = 'left'
         screen_manager.current = 'createMessageScreen'
 
-    def messageLog_action(self, title, image):
+    def messageLog_action(self, title, image, userID):
         screen_manager = self.root
         self.beforeScreen = screen_manager.current
         screen_manager.transition = SlideTransition()
         screen_manager.transition.direction = 'left'
         screen_manager.current = 'messageLogScreen'
-        self.messageLog_friendName(title, image)
+        self.messageLog_Thisfriend(title, image, userID)
 
-    def messageLog_friendName(self, title, image):
+    def messageLog_Thisfriend(self, title, image, userID):
         screen = self.root.get_screen('messageLogScreen')
         screen.ids.messageLog_friendName.title = title
         screen.ids.messageLog_friendPic.source = image
+        screen.ids.messageLog_friendID.text = f"{userID}"
 
     def editProfile_action(self):
         screen_manager = self.root
@@ -690,7 +706,7 @@ class PracticeApp(MDApp):
                 ),
                 text=f"{user[1]} {user[2]}",
                 secondary_text = "This is a test message",
-                on_release = lambda x, title = f"{user[1]} {user[2]}", sourceimage = image: self.messageLog_action(title, sourceimage)
+                on_release = lambda x, userID = user[0], title = f"{user[1]} {user[2]}", sourceimage = image: self.messageLog_action(title, sourceimage, userID)
             )
         )
 
@@ -725,6 +741,19 @@ class PracticeApp(MDApp):
             print("Post added to database!")
         else:
             print("Text length exceeded")
+
+    def create_messageLog(self, userID, messageText):
+        receiverID = int(userID) 
+        #text only accepts str so I made userID str to throw to the messageLog screen, now turn it back into int
+        senderID = self.database_search_byUsername(self.logged_in_username)[0]
+        current_date = self.get_currentTime()
+        conn = sqlite3.connect('practice_db.db')
+        c = conn.cursor()
+        c.execute("INSERT into messages (senderID, receiverID, messageText, date) VALUES (?, ?, ?, ?)", 
+                  (senderID, receiverID, messageText, current_date,))
+        conn.commit()
+        conn.close()
+        print("Message Log added to database!")
 
     def get_currentTime(self):
         return datetime.datetime.now()
