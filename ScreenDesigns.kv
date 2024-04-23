@@ -486,7 +486,7 @@
                 id: messageLog_friendPic
                 radius: 60, 60, 60, 60
         MDLabel:
-            text: "This is the message log"
+            text: "Messages are now avaialble, displaying it is currently in development"
             halign: "center"
         MDTopAppBar:
             specific_text_color: app.theme_cls.primary_color
@@ -499,12 +499,14 @@
                 theme_bg_color: "Custom"
                 md_bg_color: "white"
                 MDTextField:
+                    id: message_content
                     mode: "rectangle"
                     size_hint_x: None 
                     width: 250
                     theme_bg_color: "Custom"
                     md_bg_color: "white"
         MDIconButton:
+            id: messageLog_friendID
             icon: "send"
             md_bg_color: app.theme_cls.primary_color
             theme_icon_color: "Custom"
@@ -512,6 +514,7 @@
             icon_color: 0,0,0,1
             pos_hint: {"center_x": .90, "center_y": 0.055}
             size_hint: (.14, .08) 
+            on_release: app.create_messageLog(messageLog_friendID.text, message_content.text)
 
 <EditProfileScreen>
     name: 'editProfileScreen'
