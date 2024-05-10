@@ -485,9 +485,14 @@
             FitImage:
                 id: messageLog_friendPic
                 radius: 60, 60, 60, 60
-        MDLabel:
-            text: "Messages are now avaialble, displaying it is currently in development"
-            halign: "center"
+        ScrollView:
+            pos_hint: {'center_x': 0.5, 'center_y': 0.5} 
+            size_hint: None, None
+            size: 350, 470 
+            MDList:
+                id: message_logs
+                padding: dp(25), dp(0), dp(0), dp(0)
+                spacing: dp(15)
         MDTopAppBar:
             specific_text_color: app.theme_cls.primary_color
             specific_text_hue: app.theme_cls.primary_hue
@@ -514,7 +519,7 @@
             icon_color: 0,0,0,1
             pos_hint: {"center_x": .90, "center_y": 0.055}
             size_hint: (.14, .08) 
-            on_release: app.create_messageLog(messageLog_friendID.text, message_content.text)
+            on_release: app.create_messageLog(messageLog_friendID.text, message_content.text), app.update_messageLog()
 
 <EditProfileScreen>
     name: 'editProfileScreen'
