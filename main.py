@@ -372,6 +372,7 @@ class PracticeApp(MDApp):
         screen.ids.messageLog_friendName.title = title
         screen.ids.messageLog_friendPic.source = image
         screen.ids.messageLog_friendID.text = f"{userID}"
+        self.display_Message_Log(screen, f"{userID}")
 
     def editProfile_action(self):
         screen_manager = self.root
@@ -754,6 +755,69 @@ class PracticeApp(MDApp):
         conn.commit()
         conn.close()
         print("Message Log added to database!")
+
+    def display_Message_Log(self, screen, receiverID):
+        senderID = self.database_search_byUsername(self.logged_in_username)[0]
+        home_screen = screen
+        home_screen.ids.message_logs.clear_widgets()
+        
+        conn = sqlite3.connect('practice_db.db')
+        c = conn.cursor()
+        c.execute("SELECT * FROM messages WHERE senderID = ? AND receiverID = ?", (senderID, receiverID,))
+        senderMessages = c.fetchall()
+        conn.close()
+
+        for message in senderMessages:
+            self.message_card(home_screen, message[3])
+        
+    def message_card(self, screen, messageContent):
+        posted_date = MDLabel(
+            text = "1hr ago",
+            id="post_date",
+            adaptive_size=True,
+            theme_text_color="Custom",
+            text_color = "white",
+            halign = "left",
+            font_style = "Caption",
+            pos_hint={"center_x": .5, "center_y": 0.9}
+        )
+        posts_content = MDLabel(
+            text = messageContent,
+            id = "postContent",
+            halign = "center",
+            size_hint=(None, None), 
+            size=(275, 110),  
+            pos_hint={"center_x": .5, "center_y": 0.5}
+        )
+        additional_content_card = MDCard(
+            style="filled",
+            pos_hint={"center_x": .5, "center_y": .43},
+            size_hint=(None, None),
+            size=(280, 120),
+            theme_bg_color="Custom",
+            md_bg_color="white"
+        )
+        additional_content_card.add_widget(posts_content)
+
+        layout = MDFloatLayout()
+        layout.add_widget(posted_date)
+        layout.add_widget(additional_content_card)
+
+        main_card = MDCard(
+            style="filled",
+            pos_hint={"center_x": .5},
+            size_hint=(None, None),
+            size=(300, 160),
+            theme_bg_color="Custom",
+            md_bg_color="black"
+        )
+        main_card.add_widget(layout)
+        screen.ids.message_logs.add_widget(main_card)
+
+    def update_messageLog(self): 
+        screen = self.root.get_screen('messageLogScreen')
+        receiverID = screen.ids.messageLog_friendID.text
+        self.display_Message_Log(screen, receiverID)
 
     def get_currentTime(self):
         return datetime.datetime.now()
