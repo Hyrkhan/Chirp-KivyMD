@@ -706,7 +706,7 @@ class PracticeApp(MDApp):
                     radius=[60, 60, 60, 60]
                 ),
                 text=f"{user[1]} {user[2]}",
-                secondary_text = "This is a test message",
+                secondary_text = "Click to send a message",
                 on_release = lambda x, userID = user[0], title = f"{user[1]} {user[2]}", sourceimage = image: self.messageLog_action(title, sourceimage, userID)
             )
         )
@@ -763,14 +763,18 @@ class PracticeApp(MDApp):
         
         conn = sqlite3.connect('practice_db.db')
         c = conn.cursor()
-        c.execute("SELECT * FROM messages WHERE senderID = ? AND receiverID = ?", (senderID, receiverID,))
+        c.execute("SELECT * FROM messages WHERE (senderID = ? AND receiverID = ?) OR (senderID = ? AND receiverID = ?)", (senderID, receiverID, receiverID, senderID,))
         senderMessages = c.fetchall()
         conn.close()
 
         for message in senderMessages:
-            self.message_card(home_screen, message[3])
+            if message[1] == senderID:
+                color = "black"
+            else:
+                color = "green"
+            self.message_card(home_screen, message[3], color)
         
-    def message_card(self, screen, messageContent):
+    def message_card(self, screen, messageContent, color):
         posted_date = MDLabel(
             text = "1hr ago",
             id="post_date",
@@ -809,7 +813,7 @@ class PracticeApp(MDApp):
             size_hint=(None, None),
             size=(300, 160),
             theme_bg_color="Custom",
-            md_bg_color="black"
+            md_bg_color = color
         )
         main_card.add_widget(layout)
         screen.ids.message_logs.add_widget(main_card)
@@ -818,6 +822,7 @@ class PracticeApp(MDApp):
         screen = self.root.get_screen('messageLogScreen')
         receiverID = screen.ids.messageLog_friendID.text
         self.display_Message_Log(screen, receiverID)
+        screen.ids.message_content.text = ""
 
     def get_currentTime(self):
         return datetime.datetime.now()
