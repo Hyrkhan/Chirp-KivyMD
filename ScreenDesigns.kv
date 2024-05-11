@@ -510,6 +510,7 @@
                     width: 250
                     theme_bg_color: "Custom"
                     md_bg_color: "white"
+                    on_text_validate: app.create_messageLog(messageLog_friendID.text, message_content.text), app.update_messageLog()
         MDIconButton:
             id: messageLog_friendID
             icon: "send"
